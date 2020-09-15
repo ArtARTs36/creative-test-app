@@ -10,6 +10,18 @@ movie_show:
   controller: App\Controller\MovieController
   action: show
 
+movie_like:
+  method: 'get'
+  path: like-movie/{id}
+  controller: App\Controller\MovieController
+  action: like
+
+movie_dislike:
+  method: 'get'
+  path: dislike-movie/{id}
+  controller: App\Controller\MovieController
+  action: dislike
+
 user_register:
   method: 'get'
   path: signup

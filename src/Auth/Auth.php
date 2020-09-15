@@ -44,6 +44,11 @@ final class Auth
         return $this;
     }
 
+    public function guest(): bool
+    {
+        return $this->driver->getUserId() === null;
+    }
+
     private function getRepo(): ObjectRepository
     {
         return $this->em->getRepository(User::class);

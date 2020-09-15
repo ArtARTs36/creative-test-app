@@ -13,6 +13,7 @@ use App\Controller\HomeController;
 use App\Controller\MovieController;
 use App\Controller\UserController;
 use App\Repository\MovieRepository;
+use App\Services\LikeService;
 use App\Services\UserService;
 use App\Support\Config;
 use App\Support\ServiceProviderInterface;
@@ -65,8 +66,17 @@ class WebProvider implements ServiceProviderInterface
             );
         });
 
+        $container->set(LikeService::class, static function (ContainerInterface $container) {
+            return new LikeService($container->get(EntityManagerInterface::class));
+        });
+
         //
 
+        $this->registerControllers($container);
+    }
+
+    protected function registerControllers(ContainerInterface $container): void
+    {
         $container->set(HomeController::class, static function (ContainerInterface $container) {
             return new HomeController(
                 $container->get(Environment::class),
@@ -79,7 +89,8 @@ class WebProvider implements ServiceProviderInterface
             return new MovieController(
                 $container->get(EntityManagerInterface::class),
                 $container->get(Environment::class),
-                $container->get(Auth::class)
+                $container->get(Auth::class),
+                $container->get(LikeService::class)
             );
         });
 

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
 use UltraLite\Container\Container;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
@@ -15,5 +16,14 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         }
 
         return $this->container;
+    }
+
+    final protected function saveEntity(object $entity)
+    {
+        /** @var EntityManagerInterface $em */
+        $em = $this->getContainer()->get(EntityManagerInterface::class);
+
+        $em->persist($entity);
+        $em->flush();
     }
 }
