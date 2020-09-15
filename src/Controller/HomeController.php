@@ -61,6 +61,9 @@ class HomeController
         try {
             $data = $this->twig->render('home/index.html.twig', [
                 'trailers' => $this->fetchData(),
+                'currentTime' => new \DateTime(),
+                'controllerClass' => __CLASS__,
+                'controllerMethod' => __METHOD__,
             ]);
         } catch (\Exception $e) {
             throw new HttpBadRequestException($request, $e->getMessage(), $e);
