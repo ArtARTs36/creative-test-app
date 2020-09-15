@@ -43,7 +43,6 @@ class WebProvider implements ServiceProviderInterface
     {
         $container->set(HomeController::class, static function (ContainerInterface $container) {
             return new HomeController(
-                $container->get(RouteCollectorInterface::class),
                 $container->get(Environment::class),
                 $container->get(EntityManagerInterface::class)
             );

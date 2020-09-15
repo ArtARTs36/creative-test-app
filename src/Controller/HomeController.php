@@ -4,26 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Contracts\Controller;
 use App\Entity\Movie;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Exception\HttpBadRequestException;
-use Slim\Interfaces\RouteCollectorInterface;
 use Twig\Environment;
 
 /**
  * Class HomeController.
  */
-class HomeController
+final class HomeController extends Controller
 {
-    /**
-     * @var RouteCollectorInterface
-     */
-    private $routeCollector;
-
     /**
      * @var Environment
      */
@@ -37,13 +30,11 @@ class HomeController
     /**
      * HomeController constructor.
      *
-     * @param RouteCollectorInterface $routeCollector
      * @param Environment             $twig
      * @param EntityManagerInterface  $em
      */
-    public function __construct(RouteCollectorInterface $routeCollector, Environment $twig, EntityManagerInterface $em)
+    public function __construct(Environment $twig, EntityManagerInterface $em)
     {
-        $this->routeCollector = $routeCollector;
         $this->twig = $twig;
         $this->em = $em;
     }
@@ -60,7 +51,7 @@ class HomeController
     {
         try {
             $data = $this->twig->render('home/index.html.twig', [
-                'trailers' => $this->fetchData(),
+                'trailers' => $this->em->getRepository(Movie::class)->findAll(),
                 'currentTime' => new \DateTime(),
                 'controllerClass' => __CLASS__,
                 'controllerMethod' => __METHOD__,
@@ -69,19 +60,6 @@ class HomeController
             throw new HttpBadRequestException($request, $e->getMessage(), $e);
         }
 
-        $response->getBody()->write($data);
-
-        return $response;
-    }
-
-    /**
-     * @return Collection
-     */
-    protected function fetchData(): Collection
-    {
-        $data = $this->em->getRepository(Movie::class)
-            ->findAll();
-
-        return new ArrayCollection($data);
+        return $this->response($response, $data);
     }
 }
