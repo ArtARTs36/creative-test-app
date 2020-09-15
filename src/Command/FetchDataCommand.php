@@ -89,7 +89,7 @@ class FetchDataCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title(sprintf('Fetch data from %s', $source));
 
-        $this->processXml($this->getRawXml($source));
+        $this->processXml($this->getRawXml($source), 10);
 
         $this->logger->info(sprintf('End %s at %s', __CLASS__, (string) date_create()->format(DATE_ATOM)));
 
@@ -127,9 +127,10 @@ class FetchDataCommand extends Command
     /**
      * @param string $data
      *
+     * @param int $maxCount
      * @throws \Exception
      */
-    private function processXml(string $data): void
+    private function processXml(string $data, int $maxCount): void
     {
         $xml = (new \SimpleXMLElement($data))->children();
         $namespace = $xml->getNamespaces(true)['content'];
@@ -138,21 +139,30 @@ class FetchDataCommand extends Command
             throw new RuntimeException('Could not find \'channel\' element in feed');
         }
 
-        foreach ($xml->channel->item as $item) {
-            $trailer = $this->getMovie((string) $item->title)
-                ->setTitle((string) $item->title)
-                ->setDescription((string) $item->description)
-                ->setLink((string) $item->link)
-                ->setPubDate($this->parseDate((string) $item->pubDate))
-                ->setImage($this->selectImage($item, $namespace));
+        $counter = 0;
 
-            $this->doctrine->persist($trailer);
+        foreach ($xml->channel->item as $item) {
+            $this->doctrine->persist($this->prepareMovie($item, $namespace));
+
+            if (++$counter === $maxCount) {
+                break;
+            }
         }
 
         $this->doctrine->flush();
     }
 
-    private function selectImage($item, $namespace): ?string
+    private function prepareMovie(\SimpleXMLElement $item, string $namespace): Movie
+    {
+        return $this->getMovie((string) $item->title)
+            ->setTitle((string) $item->title)
+            ->setDescription((string) $item->description)
+            ->setLink((string) $item->link)
+            ->setPubDate($this->parseDate((string) $item->pubDate))
+            ->setImage($this->selectImage($item, $namespace));
+    }
+
+    private function selectImage(\SimpleXMLElement $item, string $namespace): ?string
     {
         $html = (string) $item->children($namespace)->encoded[0];
 
