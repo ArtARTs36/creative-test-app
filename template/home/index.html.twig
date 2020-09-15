@@ -12,6 +12,9 @@
         <table class="table table-bordered">
             {% for trailer in trailers %}
                 <tr>
+                    <td>
+                        <img src="{{ trailer.image }}" />
+                    </td>
                     <td>{{ trailer.title }}</td>
                 </tr>
             {% endfor %}
