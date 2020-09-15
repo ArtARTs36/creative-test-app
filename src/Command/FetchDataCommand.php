@@ -43,11 +43,6 @@ class FetchDataCommand extends Command
     private $logger;
 
     /**
-     * @var string
-     */
-    private $source;
-
-    /**
      * @var EntityManagerInterface
      */
     private $doctrine;
@@ -55,15 +50,19 @@ class FetchDataCommand extends Command
     /**
      * FetchDataCommand constructor.
      *
-     * @param ClientInterface        $httpClient
+     * @param ClientInterface        $http
      * @param LoggerInterface        $logger
      * @param EntityManagerInterface $em
      * @param string|null            $name
      */
-    public function __construct(ClientInterface $httpClient, LoggerInterface $logger, EntityManagerInterface $em, string $name = null)
-    {
+    public function __construct(
+        ClientInterface $http,
+        LoggerInterface $logger,
+        EntityManagerInterface $em,
+        string $name = null
+    ) {
         parent::__construct($name);
-        $this->httpClient = $httpClient;
+        $this->httpClient = $http;
         $this->logger = $logger;
         $this->doctrine = $em;
     }
@@ -72,44 +71,57 @@ class FetchDataCommand extends Command
     {
         $this
             ->setDescription('Fetch data from iTunes Movie Trailers')
-            ->addArgument('source', InputArgument::OPTIONAL, 'Overwrite source')
-        ;
+            ->addArgument('source', InputArgument::OPTIONAL, 'Overwrite source');
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->logger->info(sprintf('Start %s at %s', __CLASS__, (string) date_create()->format(DATE_ATOM)));
-        $source = self::SOURCE;
-        if ($input->getArgument('source')) {
-            $source = $input->getArgument('source');
-        }
+        $source = $this->getSourceOfInput($input) ?? static::SOURCE;
 
-        if (!is_string($source)) {
-            throw new RuntimeException('Source must be string');
-        }
         $io = new SymfonyStyle($input, $output);
         $io->title(sprintf('Fetch data from %s', $source));
 
+        $this->processXml($this->getRawXml($source));
+
+        $this->logger->info(sprintf('End %s at %s', __CLASS__, (string) date_create()->format(DATE_ATOM)));
+
+        return 0;
+    }
+
+    private function getSourceOfInput(InputInterface $input): ?string
+    {
+        if ($source = $input->getArgument('source')) {
+            if (!is_string($source)) {
+                throw new RuntimeException('Source must be string');
+            }
+
+            return $source;
+        }
+
+        return null;
+    }
+
+    private function getRawXml(string $source): string
+    {
         try {
             $response = $this->httpClient->sendRequest(new Request('GET', $source));
         } catch (ClientExceptionInterface $e) {
             throw new RuntimeException($e->getMessage());
         }
+
         if (($status = $response->getStatusCode()) !== 200) {
             throw new RuntimeException(sprintf('Response status is %d, expected %d', $status, 200));
         }
-        $data = $response->getBody()->getContents();
-        $this->processXml($data);
 
-        $this->logger->info(sprintf('End %s at %s', __CLASS__, (string) date_create()->format(DATE_ATOM)));
-
-        return 0;
+        return $response->getBody()->getContents();
     }
 
     /**
@@ -117,27 +129,38 @@ class FetchDataCommand extends Command
      *
      * @throws \Exception
      */
-    protected function processXml(string $data): void
+    private function processXml(string $data): void
     {
         $xml = (new \SimpleXMLElement($data))->children();
-//        $namespace = $xml->getNamespaces(true)['content'];
-//        dd((string) $xml->channel->item[0]->children($namespace)->encoded);
+        $namespace = $xml->getNamespaces(true)['content'];
 
         if (!property_exists($xml, 'channel')) {
             throw new RuntimeException('Could not find \'channel\' element in feed');
         }
+
         foreach ($xml->channel->item as $item) {
             $trailer = $this->getMovie((string) $item->title)
                 ->setTitle((string) $item->title)
                 ->setDescription((string) $item->description)
                 ->setLink((string) $item->link)
                 ->setPubDate($this->parseDate((string) $item->pubDate))
-            ;
+                ->setImage($this->selectImage($item, $namespace));
 
             $this->doctrine->persist($trailer);
         }
 
         $this->doctrine->flush();
+    }
+
+    private function selectImage($item, $namespace): ?string
+    {
+        $html = (string) $item->children($namespace)->encoded[0];
+
+        $matches = [];
+
+        preg_match_all("/<img[^>]*?src=[\"\']?([^\"\'\s>]+)[\"\']?[^>]*?>/i", $html, $matches);
+
+        return count($matches) < 2 ? null : $matches[1][0];
     }
 
     /**
