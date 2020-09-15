@@ -40,7 +40,7 @@ abstract class Controller
         return $response->withHeader('Location', $url);
     }
 
-    protected function warning(ResponseInterface $response, string $text)
+    protected function warning(ResponseInterface $response, string $text): ResponseInterface
     {
         $response->getBody()->write($this->render('alert.html.twig', [
             'text' => $text,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Provider;
 
+// @codingStandardsIgnoreStart
 use App\Support\{CommandMap, Config, LoggerErrorHandler, NotFoundHandler, ServiceProviderInterface};
 use GuzzleHttp\Client as GuzzleClient;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
@@ -24,6 +25,7 @@ use Slim\{CallableResolver,
     Routing\RouteResolver};
 use Twig\Environment;
 use UltraLite\Container\Container;
+// @codingStandardsIgnoreEnd
 
 /**
  * Application service provider.
@@ -31,8 +33,6 @@ use UltraLite\Container\Container;
 final class AppProvider implements ServiceProviderInterface
 {
     /**
-     * @param Container $container
-     *
      * @return mixed|void
      */
     public function register(Container $container)
@@ -64,7 +64,11 @@ final class AppProvider implements ServiceProviderInterface
 
         // Route collector
         $container->set(RouteCollector::class, static function (ContainerInterface $container) {
-            return new RouteCollector($container->get(ResponseFactoryInterface::class), $container->get(CallableResolverInterface::class), $container);
+            return new RouteCollector(
+                $container->get(ResponseFactoryInterface::class),
+                $container->get(CallableResolverInterface::class),
+                $container
+            );
         });
 
         // … and route collector interface
@@ -82,26 +86,7 @@ final class AppProvider implements ServiceProviderInterface
             return $container->get(RouteResolver::class);
         });
 
-        // Monolog
-        $container->set(Logger::class, static function (ContainerInterface $container) {
-            $config = (array) $container->get(Config::class)->get('monolog');
-            $logger = new Logger('default');
-            foreach ($config as $loggerConfig) {
-                $handler = new $loggerConfig['class'](...$loggerConfig['arguments']);
-                if (!($handler instanceof HandlerInterface)) {
-                    throw new \RuntimeException(sprintf('Class %s not implements %s', get_class($handler), HandlerInterface::class));
-                }
-                if (array_key_exists('formatter', $loggerConfig)) {
-                    $formatter = new $loggerConfig['formatter']['class'](...$loggerConfig['formatter']['arguments']);
-                    if ($formatter instanceof FormatterInterface) {
-                        $handler->setFormatter($formatter);
-                    }
-                }
-                $logger->pushHandler($handler);
-            }
-
-            return $logger;
-        });
+        $this->registerMonolog($container);
 
         // Interface for logger
         $container->set(LoggerInterface::class, static function (ContainerInterface $container) {
@@ -119,7 +104,10 @@ final class AppProvider implements ServiceProviderInterface
 
         // Errors
         $container->set(NotFoundHandler::class, static function (ContainerInterface $container) {
-            return new NotFoundHandler($container->get(ResponseFactoryInterface::class), $container->get(Environment::class));
+            return new NotFoundHandler(
+                $container->get(ResponseFactoryInterface::class),
+                $container->get(Environment::class)
+            );
         });
 
         // Errors
@@ -140,7 +128,10 @@ final class AppProvider implements ServiceProviderInterface
 
         // Middleware for routing
         $container->set(RoutingMiddleware::class, static function (ContainerInterface $container) {
-            return new RoutingMiddleware($container->get(RouteResolverInterface::class), $container->get(RouteCollector::class)->getRouteParser());
+            return new RoutingMiddleware(
+                $container->get(RouteResolverInterface::class),
+                $container->get(RouteCollector::class)->getRouteParser()
+            );
         });
 
         $container->set(GuzzleAdapter::class, static function (ContainerInterface $container) {
@@ -152,6 +143,34 @@ final class AppProvider implements ServiceProviderInterface
 
         $container->set(ClientInterface::class, static function (ContainerInterface $container) {
             return $container->get(GuzzleAdapter::class);
+        });
+    }
+
+    private function registerMonolog(Container $container): void
+    {
+        $errorMessage = function ($handler) {
+            return sprintf('Class %s not implements %s', get_class($handler), HandlerInterface::class);
+        };
+
+        $container->set(Logger::class, static function (ContainerInterface $container) use ($errorMessage) {
+            $config = (array) $container->get(Config::class)->get('monolog');
+            $logger = new Logger('default');
+            foreach ($config as $loggerConfig) {
+                $handler = new $loggerConfig['class'](...$loggerConfig['arguments']);
+                if (!($handler instanceof HandlerInterface)) {
+                    throw new \RuntimeException($errorMessage($handler));
+                }
+
+                if (array_key_exists('formatter', $loggerConfig)) {
+                    $formatter = new $loggerConfig['formatter']['class'](...$loggerConfig['formatter']['arguments']);
+                    if ($formatter instanceof FormatterInterface) {
+                        $handler->setFormatter($formatter);
+                    }
+                }
+                $logger->pushHandler($handler);
+            }
+
+            return $logger;
         });
     }
 }

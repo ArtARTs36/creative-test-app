@@ -63,7 +63,7 @@ final class UserController extends Controller
         try {
             $this->auth->login($this->service->create(...array_values($data)));
         } catch (\Exception $exception) {
-            return $this->warning($response,'Вероятно, пользователь с таким логином уже существует');
+            return $this->warning($response, 'Вероятно, пользователь с таким логином уже существует');
         }
 
         return $this->redirect($response, '/');

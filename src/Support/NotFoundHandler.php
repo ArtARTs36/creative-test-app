@@ -38,8 +38,13 @@ final class NotFoundHandler implements ErrorHandlerInterface
      *
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails, bool $logErrors, bool $logErrorDetails): ResponseInterface
-    {
+    public function __invoke(
+        ServerRequestInterface $request,
+        Throwable $exception,
+        bool $displayErrorDetails,
+        bool $logErrors,
+        bool $logErrorDetails
+    ): ResponseInterface {
         $response = $this->factory->createResponse(404);
         try {
             $response->getBody()->write($this->environment->render('404.html.twig'));

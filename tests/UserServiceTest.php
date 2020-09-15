@@ -3,7 +3,6 @@
 namespace Tests;
 
 use App\Services\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 
 final class UserServiceTest extends TestCase
 {
@@ -19,6 +18,27 @@ final class UserServiceTest extends TestCase
 
         self::assertEquals($name, $user->getName());
         self::assertEquals(md5($password), $user->getPassword());
+    }
+
+    /**
+     * @covers \App\Services\UserService::findByCredentials
+     */
+    public function testFindByCredentials(): void
+    {
+        // 1. БД пустая, юзера нет
+
+        self::assertNull($this->getService()->findByCredentials('random', 'random'));
+
+        // 2. Создали юзера, попробовали найти с некорректным паролем
+
+        $user = $this->getService()->create($login = 'User', $password = 55);
+
+        self::assertNull($this->getService()->findByCredentials($login, 66));
+
+        // 3. Пробуем найти с корректными логином и паролем
+
+        self::assertNotEmpty($findUser = $this->getService()->findByCredentials($login, $password));
+        self::assertEquals($user->getName(), $findUser->getName());
     }
 
     private function getService(): UserService

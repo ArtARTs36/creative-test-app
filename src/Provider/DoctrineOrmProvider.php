@@ -23,17 +23,23 @@ use UltraLite\Container\Container;
  */
 final class DoctrineOrmProvider implements ServiceProviderInterface
 {
-    /**
-     * @param Container $container
-     */
     public function register(Container $container): void
     {
         $container->set(EntityManager::class, function (ContainerInterface $container): EntityManager {
             $config = $container->get(Config::class);
 
-            $doctrineConfig = Setup::createAnnotationMetadataConfiguration($config->get('doctrine')['mapping'], getenv('APP_ENV') === 'dev');
-            $doctrineConfig->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), $config->get('doctrine')['mapping']));
-            $doctrineConfig->setMetadataCacheImpl(new FilesystemCache($config->get('base_dir') . '/var/cache/doctrine'));
+            $doctrineConfig = Setup::createAnnotationMetadataConfiguration(
+                $config->get('doctrine')['mapping'],
+                getenv('APP_ENV') === 'dev'
+            );
+
+            $doctrineConfig->setMetadataDriverImpl(
+                new AnnotationDriver(new AnnotationReader(), $config->get('doctrine')['mapping'])
+            );
+
+            $doctrineConfig->setMetadataCacheImpl(
+                new FilesystemCache($config->get('base_dir') . '/var/cache/doctrine')
+            );
 
             $connectionConfig = array_merge($config->get('doctrine')['connection'], [
                 'url' => getenv('DATABASE'),
@@ -42,8 +48,11 @@ final class DoctrineOrmProvider implements ServiceProviderInterface
             return EntityManager::create($connectionConfig, $doctrineConfig);
         });
 
-        $container->set(EntityManagerInterface::class, static function (ContainerInterface $container): EntityManagerInterface {
-            return $container->get(EntityManager::class);
-        });
+        $container->set(
+            EntityManagerInterface::class,
+            static function (ContainerInterface $container): EntityManagerInterface {
+                return $container->get(EntityManager::class);
+            }
+        );
     }
 }

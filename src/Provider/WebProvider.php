@@ -32,7 +32,6 @@ final class WebProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $container
-     *
      * @return mixed|void
      */
     public function register(Container $container)
@@ -41,22 +40,15 @@ final class WebProvider implements ServiceProviderInterface
         $this->defineRoutes($container);
     }
 
-    /**
-     * @param Container $container
-     */
     protected function defineControllerDi(Container $container): void
     {
         $container->set(UserService::class, static function (ContainerInterface $container) {
             return new UserService($container->get(EntityManagerInterface::class));
         });
 
-        //
-
         $container->set(Session::class, static function () {
             return new Session();
         });
-
-        //
 
         $container->set(Auth::class, static function (ContainerInterface $container) {
             return new Auth(
@@ -68,8 +60,6 @@ final class WebProvider implements ServiceProviderInterface
         $container->set(LikeService::class, static function (ContainerInterface $container) {
             return new LikeService($container->get(EntityManagerInterface::class));
         });
-
-        //
 
         $this->registerControllers($container);
     }
@@ -93,7 +83,7 @@ final class WebProvider implements ServiceProviderInterface
             );
         });
 
-        $container->set(UserController::class, static function(ContainerInterface $container) {
+        $container->set(UserController::class, static function (ContainerInterface $container) {
             return new UserController(
                 $container->get(UserService::class),
                 $container->get(Environment::class),
@@ -102,9 +92,6 @@ final class WebProvider implements ServiceProviderInterface
         });
     }
 
-    /**
-     * @param Container $container
-     */
     protected function defineRoutes(Container $container): void
     {
         $router = $container->get(RouteCollectorInterface::class);
@@ -121,11 +108,6 @@ final class WebProvider implements ServiceProviderInterface
         });
     }
 
-    /**
-     * @param Container $container
-     *
-     * @return array
-     */
     protected static function getRoutes(Container $container): array
     {
         return Yaml::parseFile($container->get(Config::class)->get('base_dir') . '/config/routes.yaml');
