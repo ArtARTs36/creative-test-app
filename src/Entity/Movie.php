@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MovieRepository")
- * @ORM\Table(name="movie", indexes={@Index(columns={"title"})})
+ * @ORM\Table(name="movies", indexes={@Index(columns={"title"})})
  */
 final class Movie
 {

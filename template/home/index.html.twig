@@ -23,7 +23,11 @@
                     <td>
                         <img src="{{ trailer.image }}" />
                     </td>
-                    <td>{{ trailer.title }}</td>
+                    <td>
+                        <a href="/movies/{{ trailer.id }}">
+                            {{ trailer.title }}
+                        </a>
+                    </td>
                 </tr>
             {% endfor %}
         </table>
