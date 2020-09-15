@@ -64,7 +64,7 @@ final class MovieController extends Controller
         ResponseInterface $response,
         \Closure $closure
     ): ResponseInterface {
-        if (! $request->getAttribute('id')) {
+        if (!$request->getAttribute('id')) {
             return $this->warning($response, 'Мы не смогли найти заправшиваемый трейлер');
         }
 
