@@ -7,7 +7,7 @@ namespace App\Support;
 /**
  * Class CommandMap.
  */
-class CommandMap
+final class CommandMap
 {
     /**
      * @var array

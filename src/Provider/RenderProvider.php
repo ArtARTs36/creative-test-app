@@ -14,7 +14,7 @@ use UltraLite\Container\Container;
 /**
  * Class RenderProvider.
  */
-class RenderProvider implements ServiceProviderInterface
+final class RenderProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $container

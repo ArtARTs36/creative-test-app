@@ -9,7 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Class Config.
  */
-class Config
+final class Config
 {
     /**
      * @var array

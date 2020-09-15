@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 use Slim\Handlers\ErrorHandler;
 use Slim\Interfaces\CallableResolverInterface;
 
-class LoggerErrorHandler extends ErrorHandler
+final class LoggerErrorHandler extends ErrorHandler
 {
     /**
      * @var LoggerInterface

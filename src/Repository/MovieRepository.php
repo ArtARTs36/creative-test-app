@@ -12,6 +12,6 @@ use Doctrine\ORM\EntityRepository;
 /**
  * Class MovieRepository.
  */
-class MovieRepository extends EntityRepository
+final class MovieRepository extends EntityRepository
 {
 }

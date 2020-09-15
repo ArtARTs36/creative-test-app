@@ -28,7 +28,7 @@ use UltraLite\Container\Container;
 /**
  * Application service provider.
  */
-class AppProvider implements ServiceProviderInterface
+final class AppProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $container

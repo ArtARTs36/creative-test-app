@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Class RouteListCommand.
  */
-class RouteListCommand extends Command
+final class RouteListCommand extends Command
 {
     /**
      * @var string

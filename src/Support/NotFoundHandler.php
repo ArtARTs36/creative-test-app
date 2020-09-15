@@ -11,7 +11,7 @@ use Slim\Interfaces\ErrorHandlerInterface;
 use Throwable;
 use Twig\Environment;
 
-class NotFoundHandler implements ErrorHandlerInterface
+final class NotFoundHandler implements ErrorHandlerInterface
 {
     /**
      * @var ResponseFactoryInterface

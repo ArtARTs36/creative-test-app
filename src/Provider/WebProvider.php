@@ -12,7 +12,6 @@ use App\Auth\Drivers\SessionDriver;
 use App\Controller\HomeController;
 use App\Controller\MovieController;
 use App\Controller\UserController;
-use App\Repository\MovieRepository;
 use App\Services\LikeService;
 use App\Services\UserService;
 use App\Support\Config;
@@ -29,7 +28,7 @@ use UltraLite\Container\Container;
 /**
  * Class WebProvider.
  */
-class WebProvider implements ServiceProviderInterface
+final class WebProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $container

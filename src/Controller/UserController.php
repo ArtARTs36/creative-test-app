@@ -21,16 +21,38 @@ final class UserController extends Controller
         parent::__construct($auth, $twig);
     }
 
+    /**
+     * Показать форму регистрации
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
     public function showRegisterForm(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         return $this->response($response, $this->render('users/register.html.twig'));
     }
 
+    /**
+     * Показать форму авторизации
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
     public function showLoginForm(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         return $this->response($response, $this->render('users/login.html.twig'));
     }
 
+    /**
+     * Создать пользователя
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     * @throws \Slim\Exception\HttpException
+     */
     public function store(ServerRequestInterface $request, ResponseInterface $response)
     {
         $data = Validator::handle($request, [
@@ -47,6 +69,13 @@ final class UserController extends Controller
         return $this->redirect($response, '/');
     }
 
+    /**
+     * Выход пользователя из системы
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
     public function logout(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $this->auth->logout();
@@ -54,6 +83,14 @@ final class UserController extends Controller
         return $this->redirect($response, '/');
     }
 
+    /**
+     * Авторизация
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     * @throws \Slim\Exception\HttpException
+     */
     public function login(ServerRequestInterface $request, ResponseInterface $response)
     {
         $data = Validator::handle($request, [

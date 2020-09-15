@@ -18,7 +18,7 @@ use UltraLite\Container\Container;
 /**
  * Class ConsoleCommandProvider.
  */
-class ConsoleCommandProvider implements ServiceProviderInterface
+final class ConsoleCommandProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $container

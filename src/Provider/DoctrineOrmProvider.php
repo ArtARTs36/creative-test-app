@@ -21,7 +21,7 @@ use UltraLite\Container\Container;
 /**
  * Class DoctrineOrmProvider.
  */
-class DoctrineOrmProvider implements ServiceProviderInterface
+final class DoctrineOrmProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $container

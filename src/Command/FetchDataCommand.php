@@ -23,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Class FetchDataCommand.
  */
-class FetchDataCommand extends Command
+final class FetchDataCommand extends Command
 {
     private const SOURCE = 'https://trailers.apple.com/trailers/home/rss/newtrailers.rss';
 
