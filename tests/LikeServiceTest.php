@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Entity\Like;
 use App\Entity\Movie;
 use App\Entity\User;
 use App\Services\LikeService;
@@ -20,6 +21,42 @@ final class LikeServiceTest extends TestCase
 
         self::assertEquals($movie->getId(), $like->getMovie()->getId());
         self::assertEquals($user->getId(), $like->getUser()->getId());
+
+        self::assertTrue($this->getService()->isLiked($movie, $user));
+    }
+
+    /**
+     * @covers \App\Services\LikeService::dislike
+     */
+    public function testDislike(): void
+    {
+        $movie = $this->createMovie();
+        $user = $this->createUser();
+
+        $likeId = $this->getService()->perform($movie, $user)->getId();
+
+        //
+
+        $this->getService()->dislike($movie, $user);
+
+        //
+
+        self::assertNull($this->getEntityManager()->getRepository(Like::class)->find($likeId));
+    }
+
+    /**
+     * @covers \App\Services\LikeService::isLiked
+     */
+    public function testIsLiked(): void
+    {
+        $movie = $this->createMovie();
+        $user = $this->createUser();
+
+        self::assertFalse($this->getService()->isLiked($movie, $user));
+
+        //
+
+        $this->getService()->perform($movie, $user);
 
         self::assertTrue($this->getService()->isLiked($movie, $user));
     }

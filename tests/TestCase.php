@@ -18,6 +18,11 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         return $this->container;
     }
 
+    final protected function getEntityManager(): EntityManagerInterface
+    {
+        return $this->getContainer()->get(EntityManagerInterface::class);
+    }
+
     final protected function saveEntity(object $entity)
     {
         /** @var EntityManagerInterface $em */
