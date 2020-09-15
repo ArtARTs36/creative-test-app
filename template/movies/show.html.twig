@@ -1,0 +1,49 @@
+{% extends 'main.html.twig' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mt-5 mb-4">Трейлер: {{ movie.title }}</h1>
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    Название
+                </td>
+                <td>
+                    {{ movie.title }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Постер
+                </td>
+                <td>
+                    <img src="{{ movie.image }}" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Описание
+                </td>
+                <td>
+                    {{ movie.description }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Источник
+                </td>
+                <td>
+                    <a href="{{ movie.link }}">
+                        {{ movie.link }}
+                    </a>
+                </td>
+            </tr>
+        </table>
+
+        <a href="/">
+            Вернуться к списку трейлеров
+        </a>
+    </div>
+{% endblock %}

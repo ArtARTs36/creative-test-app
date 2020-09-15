@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace App\Provider;
 
 use App\Controller\HomeController;
+use App\Controller\MovieController;
+use App\Repository\MovieRepository;
 use App\Support\Config;
 use App\Support\ServiceProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,7 +42,18 @@ class WebProvider implements ServiceProviderInterface
     protected function defineControllerDi(Container $container): void
     {
         $container->set(HomeController::class, static function (ContainerInterface $container) {
-            return new HomeController($container->get(RouteCollectorInterface::class), $container->get(Environment::class), $container->get(EntityManagerInterface::class));
+            return new HomeController(
+                $container->get(RouteCollectorInterface::class),
+                $container->get(Environment::class),
+                $container->get(EntityManagerInterface::class)
+            );
+        });
+
+        $container->set(MovieController::class, static function (ContainerInterface $container) {
+            return new MovieController(
+                $container->get(EntityManagerInterface::class),
+                $container->get(Environment::class)
+            );
         });
     }
 
@@ -52,9 +65,12 @@ class WebProvider implements ServiceProviderInterface
         $router = $container->get(RouteCollectorInterface::class);
 
         $router->group('/', function (RouteCollectorProxyInterface $router) use ($container) {
-            $routes = self::getRoutes($container);
-            foreach ($routes as $routeName => $routeConfig) {
-                $router->{$routeConfig['method']}($routeConfig['path'] ?? '', $routeConfig['controller'] . ':' . $routeConfig['action'])
+            foreach (self::getRoutes($container) as $routeName => $routeConfig) {
+                $router
+                    ->{$routeConfig['method']}(
+                        $routeConfig['path'] ?? '',
+                        $routeConfig['controller'] . ':' . $routeConfig['action']
+                    )
                     ->setName($routeName);
             }
         });
