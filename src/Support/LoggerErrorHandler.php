@@ -26,8 +26,11 @@ final class LoggerErrorHandler extends ErrorHandler
      * @param ResponseFactoryInterface  $responseFactory
      * @param LoggerInterface           $logger
      */
-    public function __construct(CallableResolverInterface $callableResolver, ResponseFactoryInterface $responseFactory, LoggerInterface $logger)
-    {
+    public function __construct(
+        CallableResolverInterface $callableResolver,
+        ResponseFactoryInterface $responseFactory,
+        LoggerInterface $logger
+    ) {
         parent::__construct($callableResolver, $responseFactory);
         $this->logger = $logger;
     }

@@ -29,7 +29,8 @@ final class RenderProvider implements ServiceProviderInterface
             $cache = $config->get('templates')['cache'];
 
             $options = [
-                'cache' => empty($cache) || $container->get(Config::class)->get('environment') === 'dev' ? false : $cache,
+                'cache' => empty($cache) ||
+                    $container->get(Config::class)->get('environment') === 'dev' ? false : $cache,
             ];
 
             return new Environment($loader, $options);
