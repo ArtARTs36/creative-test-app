@@ -26,31 +26,31 @@ final class Movie
 
     /**
      * @var string|null
-     * @ORM\Column()
+     * @ORM\Column(type="string", nullable=true)
      */
     private $title;
 
     /**
      * @var string|null
-     * @ORM\Column()
+     * @ORM\Column(type="string", nullable=true)
      */
     private $link;
 
     /**
      * @var string|null
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     private $description;
 
     /**
      * @var \DateTime|null
-     * @ORM\Column(type="datetime", name="pub_date")
+     * @ORM\Column(type="datetime", name="pub_date", nullable=true)
      */
     private $pubDate;
 
     /**
      * @var string|null
-     * @ORM\Column(nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $image;
 
