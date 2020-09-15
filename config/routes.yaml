@@ -9,3 +9,33 @@ movie_show:
   path: movies/{id}
   controller: App\Controller\MovieController
   action: show
+
+user_register:
+  method: 'get'
+  path: signup
+  controller: App\Controller\UserController
+  action: showRegisterForm
+
+user_login_form:
+  method: 'get'
+  path: signin
+  controller: App\Controller\UserController
+  action: showLoginForm
+
+user_login:
+  method: 'post'
+  path: signin
+  controller: App\Controller\UserController
+  action: login
+
+user_store:
+  method: 'post'
+  path: signup
+  controller: App\Controller\UserController
+  action: store
+
+user_logout:
+  method: 'get'
+  path: logout
+  controller: App\Controller\UserController
+  action: logout

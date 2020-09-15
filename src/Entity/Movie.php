@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\Index;
 final class Movie
 {
     /**
-     * @var int|null
+     * @var int
      * @ORM\Id()
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")

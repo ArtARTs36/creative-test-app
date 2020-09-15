@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Auth\Auth;
 use App\Contracts\Controller;
 use App\Entity\Movie;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,11 +19,6 @@ use Twig\Environment;
 final class HomeController extends Controller
 {
     /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
      * @var EntityManagerInterface
      */
     private $em;
@@ -33,10 +29,11 @@ final class HomeController extends Controller
      * @param Environment             $twig
      * @param EntityManagerInterface  $em
      */
-    public function __construct(Environment $twig, EntityManagerInterface $em)
+    public function __construct(Environment $twig, EntityManagerInterface $em, Auth $auth)
     {
-        $this->twig = $twig;
         $this->em = $em;
+
+        parent::__construct($auth, $twig);
     }
 
     /**
@@ -50,7 +47,7 @@ final class HomeController extends Controller
     public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         try {
-            $data = $this->twig->render('home/index.html.twig', [
+            $data = $this->render('home/index.html.twig', [
                 'trailers' => $this->em->getRepository(Movie::class)->findAll(),
                 'currentTime' => new \DateTime(),
                 'controllerClass' => __CLASS__,

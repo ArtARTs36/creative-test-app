@@ -8,7 +8,15 @@
         <p>Controller Class: {{ controllerClass }}</p>
         <p>Controller Method: {{ controllerMethod }}</p>
 
-        <h1 class="mt-5 mb-4">{{ trailers | length }} iTunes Movie trailers</h1>
+        <h1 class="mt-5 mb-4">
+            {{ trailers | length }} iTunes Movie trailers |
+
+            {% if user %}
+                Вы вошли как: {{ user.name }}, <a href="/logout">Выйти</a>
+            {% else %}
+                <a href="/signin">Авторизоваться</a>
+            {% endif %}
+        </h1>
         <table class="table table-bordered">
             {% for trailer in trailers %}
                 <tr>
