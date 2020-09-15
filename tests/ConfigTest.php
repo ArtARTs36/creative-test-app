@@ -6,15 +6,15 @@ use App\Support\Config;
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends TestCase
+final class ConfigTest extends TestCase
 {
-    public function test__construct(): void
+    public function testConstruct(): void
     {
         $config = new Config(dirname(__DIR__) . '/config', 'test', dirname(__DIR__));
         $this->assertInstanceOf(Config::class, $config);
     }
 
-    public function test__costructError(): void
+    public function testConstructError(): void
     {
         $this->expectException(RuntimeException::class);
         new Config('not-exists', 'test', 'not-exists-too');
