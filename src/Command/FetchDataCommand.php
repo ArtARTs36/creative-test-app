@@ -168,10 +168,6 @@ class FetchDataCommand extends Command
             $this->logger->info('Move found', ['title' => $title]);
         }
 
-        if (!($item instanceof Movie)) {
-            throw new RuntimeException('Wrong type!');
-        }
-
         return $item;
     }
 }
